@@ -1,120 +1,50 @@
-# Quick Reference Card - Automation System
+# Quick Reference Card - BookAgent GUI
 
-## Essential Commands
+## 🚀 Essential GUI Commands
 
-### Process One Stage
+### Start the System
+1. **Backend**: `source gui/backend/venv/bin/activate && python gui/backend/main.py`
+2. **Frontend**: `cd gui/client && npm run dev`
+3. **Visit**: `http://localhost:5173`
 
-```bash
-# Writer
-python scripts/task_runner.py -s "Writer Doing" -i prompts/WRITER_INSTRUCTIONS.md -f "Writer Done"
+### World Management
+- **New World**: Click dropdown -> `+ New World`.
+- **Auto-Generate**: Use `AI: [instruction]` in Theme/Glitch fields and click **Auto-Generate (AI)**.
 
-# Character Curator
-python scripts/task_runner.py -s "CC Doing" -i prompts/CC_INSTRUCTIONS.md -f "CC Done"
+### Planning Pipeline
+- **Brainstorm**: In the Planning tab, click **Generate from Source**.
+- **Rate**: Approving concepts requires a **3+ star** rating.
+- **Refresh**: The GUI auto-updates once Agent tasks finish (via log polling).
 
-# Style Editor
-python scripts/task_runner.py -s "SE Doing" -i prompts/SE_INSTRUCTIONS.md -f "SE Done"
+---
 
-# QA
-python scripts/task_runner.py -s "QA Doing" -i prompts/QA_INSTRUCTIONS.md -f "Finished"
+## 📂 File Structure
 
-# PO Review
-python scripts/task_runner.py -s "PO Review" -i prompts/PO_INSTRUCTIONS.md -f "Finished"
-```
+| Folder | Contents |
+|--------|----------|
+| `worlds/` | All projects (worlds) |
+| `worlds/[name]/canon/` | World configuration and Bibles |
+| `worlds/[name]/chapters/` | Drafted chapter prose |
+| `worlds/[name]/planning/` | Brainstorms, Maps, and Cards |
+| `prompts/` | AI system instructions |
+| `gui/` | Backend and Frontend code |
 
-### Process Complete Pipeline
+---
 
-```bash
-# Interactive mode
-python scripts/batch_process.py
+## 🛠️ Advanced (CLI)
 
-# Automated mode
-python scripts/batch_process.py --no-interactive
-
-# Process 3 tasks per stage
-python scripts/batch_process.py --limit 3
-```
-
-### Planning & Inspiration
-
-```bash
-# Iterative Brainstorm (loops through NLP/ source)
-python scripts/generate_brainstorm_iterative.py --world [name]
-
-# Generate Chapter Map from approved concepts
-python scripts/generate_chapter_map.py --world [name] --count 10
-
-# Evaluate a book plan
-python scripts/evaluate_plan.py --world [name]
-```
-
-## Common Options
-
-| Flag | Description | Example |
-|------|-------------|---------|
-| `-s` | Source status | `-s "Writer Doing"` |
-| `-i` | Instruction template | `-i prompts/WRITER_INSTRUCTIONS.md` |
-| `-f` | Finish status | `-f "Writer Done"` |
-| `--limit` | Max tasks to process | `--limit 5` |
-| `--no-interactive` | No prompts | `--no-interactive` |
-| `--workspace` | Workspace path | `--workspace /path/to/nlpbook` |
-
-## Status Flow
-
-```
-Backlog → Writer Doing → Writer Done → CC Doing → CC Done → 
-SE Doing → SE Done → QA Doing → Finished
-```
-
-## Template Variables
-
-- `{{TASK_ID}}` - Task identifier
-- `{{TASK_TITLE}}` - Task title  
-- `{{TASK_DESCRIPTION}}` - Full description
-- `{{TASK_NOTES}}` - Additional notes
-- `{{CHAPTER_NUM}}` - Chapter number (extracted from title)
-
-## File Locations
-
-| Type | Location |
-|------|----------|
-| Main Script | `scripts/task_runner.py` |
-| Batch Script | `scripts/batch_process.py` |
-| Templates | `prompts/*.md` |
-| Generated Instructions | `GEMINI.md` |
-| Canon Files | `canon/` |
-| Process Docs | `process/` |
-
-## Troubleshooting
-
-**No tasks found?**
-- Check status spelling (case-sensitive)
-- Verify tasks exist in backlog.md with that status
-
-**Gemini CLI not found?**
-- Install: https://github.com/google-gemini/gemini-cli
-- Check PATH: `gemini --version`
-
-**Template errors?**
-- Check template path is relative to workspace
-- Verify file exists in `prompts/`
-
-## Quick Start
-
-1. Move tasks to "Writer Doing" in backlog.md
-2. Run: `python scripts/task_runner.py -s "Writer Doing" -i prompts/WRITER_INSTRUCTIONS.md -f "Writer Done"`
-3. Continue through pipeline stages
-
-## Getting Help
+> [!NOTE]
+> The GUI is the preferred interface. Use these CLI tools only for debugging.
 
 ```bash
-# Show help
-python scripts/task_runner.py --help
-python scripts/batch_process.py --help
+# Refine a specific chapter manually
+python scripts/refine_chapters.py --world [name] --chapter [num] --type writer
+
+# Generate a storyline/timeline
+python scripts/generate_storyline.py --world [name]
 ```
 
-## Documentation
-
-- `AUTOMATION_SETUP.md` - Complete setup guide
-- `MIGRATION_SUMMARY.md` - What changed and why
-- `README.md` - Project overview
-- `process/RUNBOOK.md` - Workflow guide
+## 📄 Documentation
+- `README.md` - Setup and feature overview.
+- `GUI_WORKFLOW.md` - Step-by-step visual guide.
+- `archive/` - Legacy CLI documentation.

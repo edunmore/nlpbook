@@ -108,34 +108,68 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
         setGenOutput('Brainstorm approved! Ready to generate chapter map.');
     };
 
-    const generateBrainstorm = async () => {
+    // Generic generation with Polling
+    const runGenerationTask = async (taskName, apiCall, reloadCallback) => {
         setIsGenerating(true);
-        setGenOutput('Generating brainstorm from source material...');
+        setGenOutput(`${taskName} started...`);
         try {
-            const maxFiles = config.source_max_files || 5;
-            await axios.post(`${API_BASE}/generate/brainstorm`, { world: currentWorld, count: maxFiles });
-            setGenOutput('Brainstorm generation started. Refresh to see results.');
-            setTimeout(() => loadBrainstorm(), 3000);
+            await apiCall();
+
+            // Poll logs until completion
+            const pollInterval = setInterval(async () => {
+                try {
+                    const res = await axios.get(`${API_BASE}/logs`);
+                    const logs = res.data.logs;
+                    const recentLogs = logs.slice(-10); // Look at last 10 lines
+
+                    // Check for general completion or specific task completion signals
+                    // The backend scripts often print "Process finished with code 0"
+                    const isComplete = recentLogs.some(l =>
+                        l.includes("Process finished with code 0") ||
+                        l.includes("Saved timeline") ||
+                        l.includes("Saved: ") ||
+                        l.includes("Error:")
+                    );
+
+                    if (isComplete) {
+                        clearInterval(pollInterval);
+                        setIsGenerating(false);
+                        setGenOutput(`${taskName} complete!`);
+                        if (reloadCallback) reloadCallback();
+                    }
+                } catch (e) {
+                    console.error("Polling error", e);
+                }
+            }, 1000);
+
+            // Safety timeout (2 minutes)
+            setTimeout(() => {
+                clearInterval(pollInterval);
+                if (isGenerating) setIsGenerating(false);
+            }, 120000);
+
         } catch (err) {
             setGenOutput('Error: ' + err.message);
-        } finally {
             setIsGenerating(false);
         }
     };
 
-    const generateMap = async () => {
-        setIsGenerating(true);
-        setGenOutput('Generating chapter map...');
-        try {
-            const chapterCount = config.chapter_count || 10;
-            await axios.post(`${API_BASE}/generate/map`, { world: currentWorld, count: chapterCount });
-            setGenOutput('Map generation started. Refresh to see results.');
-            setTimeout(() => loadChapterMap(), 3000);
-        } catch (err) {
-            setGenOutput('Error: ' + err.message);
-        } finally {
-            setIsGenerating(false);
-        }
+    const generateBrainstorm = () => {
+        const maxFiles = config.source_max_files || 5;
+        runGenerationTask(
+            'Brainstorm Generation',
+            () => axios.post(`${API_BASE}/generate/brainstorm`, { world: currentWorld, count: maxFiles }),
+            loadBrainstorm
+        );
+    };
+
+    const generateMap = () => {
+        const chapterCount = config.chapter_count || 10;
+        runGenerationTask(
+            'Chapter Map Generation',
+            () => axios.post(`${API_BASE}/generate/map`, { world: currentWorld, count: chapterCount }),
+            loadChapterMap
+        );
     };
 
     const saveChapterMap = async () => {
@@ -157,37 +191,22 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
         setGenOutput('Map approved! Ready to generate chapter cards.');
     };
 
-    const generateNextCard = async () => {
-        setIsGenerating(true);
+    const generateNextCard = () => {
         const nextNum = chapterCards.length + 1;
-        setGenOutput(`Generating card for Chapter ${nextNum}...`);
-        try {
-            await axios.post(`${API_BASE}/generate/cards`, { world: currentWorld, count: 1, start: nextNum });
-            setGenOutput(`Card ${nextNum} generation started.`);
-            setTimeout(() => loadChapterCards(), 3000);
-        } catch (err) {
-            setGenOutput('Error: ' + err.message);
-        } finally {
-            setIsGenerating(false);
-        }
+        runGenerationTask(
+            `Card ${nextNum} Generation`,
+            () => axios.post(`${API_BASE}/generate/cards`, { world: currentWorld, count: 1, start: nextNum }),
+            loadChapterCards
+        );
     };
 
-    const generateNextChapter = async () => {
-        setIsGenerating(true);
+    const generateNextChapter = () => {
         const nextNum = chapters.length + 1;
-        setGenOutput(`Generating Chapter ${nextNum}...`);
-        try {
-            await axios.post(`${API_BASE}/generate/chapters`, { world: currentWorld, count: 1, start: nextNum });
-            setGenOutput(`Chapter ${nextNum} generation started.`);
-            setTimeout(() => {
-                loadChapters();
-                if (onRefresh) onRefresh();
-            }, 5000);
-        } catch (err) {
-            setGenOutput('Error: ' + err.message);
-        } finally {
-            setIsGenerating(false);
-        }
+        runGenerationTask(
+            `Chapter ${nextNum} Generation`,
+            () => axios.post(`${API_BASE}/generate/chapters`, { world: currentWorld, count: 1, start: nextNum }),
+            () => { loadChapters(); if (onRefresh) onRefresh(); }
+        );
     };
 
     const renderStars = (rating, index) => {

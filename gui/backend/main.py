@@ -43,6 +43,7 @@ class RefineRequest(BaseModel):
     chapter: Optional[str] = None # e.g. "001"
     model: str = "gemini"
     world: str = "default"
+    type: str = "custom" # custom, writer, cc, se, qa, po
 
 class WorldRequest(BaseModel):
     name: str
@@ -176,7 +177,7 @@ def list_chapters(world: str = "default"):
     files = sorted(paths["chapters"].glob("CH*.md"))
     return [{"filename": f.name, "path": str(f)} for f in files]
 
-@app.get("/api/chapters/{filename}")
+@app.get("/api/chapters/{filename:path}")
 def get_chapter(filename: str, world: str = "default"):
     paths = get_world_paths(world)
     path = paths["chapters"] / filename
@@ -237,7 +238,7 @@ def run_refinement(req: RefineRequest):
     # I will fix refine_chapters.py in a separate tool call.
     
     # Passing --world to refine script
-    cmd = [sys.executable, str(SCRIPT_PATH), "--model", req.model, "--world", req.world]
+    cmd = [sys.executable, str(SCRIPT_PATH), "--model", req.model, "--world", req.world, "--type", req.type]
     if req.chapter:
         cmd.extend(["--chapter", req.chapter])
         
@@ -356,6 +357,12 @@ def generate_brainstorm(req: GenerateRequest):
 def generate_map(req: GenerateRequest):
     script = SCRIPTS_DIR / "generate_chapter_map.py"
     cmd = [sys.executable, str(script), "--world", req.world, "--count", str(req.count)]
+    return run_script_threaded(cmd)
+
+@app.post("/api/generate/world")
+def generate_world(req: GenerateRequest):
+    script = WORKSPACE_ROOT / "scripts" / "generate_world.py"
+    cmd = [sys.executable, str(script), "--world", req.world]
     return run_script_threaded(cmd)
 
 # --- Brainstorm Review API ---

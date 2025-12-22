@@ -23,7 +23,18 @@ function WorldHelper({ currentWorld }) {
     const fetchLogs = async () => {
         try {
             const res = await axios.get(`${API_BASE}/logs`);
-            setLogs(res.data.logs);
+            const newLogs = res.data.logs;
+            setLogs(newLogs);
+
+            // Check if generation finished successfully
+            // Scan last few logs for success message
+            const recentLogs = newLogs.slice(-5);
+            const success = recentLogs.some(l => l.includes("Updated config:") || l.includes("World generation complete"));
+
+            if (success) {
+                setGenerating(false);
+                fetchConfig();
+            }
         } catch (e) {
             console.error("Log error", e);
         }
@@ -80,17 +91,14 @@ function WorldHelper({ currentWorld }) {
         setConfig({ ...config, characters: newChars });
     };
 
-    const autoGenCharacters = async () => {
+    const autoGenWorld = async () => {
         setGenerating(true);
         try {
-            await axios.post(`${API_BASE}/generate/characters`, { world: currentWorld, count: 3 });
-            // We don't wait for result here since it's backgrounded, but we poll logs
-            // polling will show progress.
-            // After some time we should reload config? 
-            // Ideally the backend tells us when done, but for now we just rely on user reloading or manual check.
-            // Or we can poll config occasionally? Let's just poll logs.
+            await axios.post(`${API_BASE}/generate/world`, { world: currentWorld });
+            // Polling handles the rest
         } catch (err) {
             console.error(err);
+            setGenerating(false);
         }
     };
 
@@ -128,6 +136,10 @@ function WorldHelper({ currentWorld }) {
     return (
         <div className="world-helper">
             <h2><Globe size={20} /> World Builder: {currentWorld}</h2>
+
+            <div className="info-banner" style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+                <strong>How to use AI:</strong> Type instructions like <code>AI: make the tone darker</code> into any field below, then click <strong>Auto-Generate (AI)</strong>. The AI will apply your changes even to empty fields!
+            </div>
 
             <div className="config-form">
                 <div className="form-section full-width">
@@ -175,7 +187,7 @@ function WorldHelper({ currentWorld }) {
                         <button className="secondary-btn" onClick={addCharacter}>
                             <Plus size={14} /> Add Manual
                         </button>
-                        <button className="secondary-btn special" onClick={autoGenCharacters} disabled={generating}>
+                        <button className="secondary-btn special" onClick={autoGenWorld} disabled={generating}>
                             ✨ Auto-Generate (AI)
                         </button>
                     </div>

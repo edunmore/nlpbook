@@ -74,10 +74,28 @@ def main():
         print(f"Chapters directory not found for world '{args.world}'")
         sys.exit(1)
 
-    # Load improvement ideas
-    improvement_ideas = load_file(IMPROVEMENT_FILE)
-    if not improvement_ideas.strip():
-        print(f"Warning: {IMPROVEMENT_FILE} appears empty. Please add instructions there.")
+    # Load instructions based on type
+    instructions = ""
+    if args.type.lower() == "custom":
+        instructions = load_file(IMPROVEMENT_FILE)
+    else:
+        type_map = {
+            "writer": "WRITER_INSTRUCTIONS.md",
+            "cc": "CC_INSTRUCTIONS.md",
+            "se": "SE_INSTRUCTIONS.md",
+            "qa": "QA_INSTRUCTIONS.md",
+            "po": "PO_INSTRUCTIONS.md"
+        }
+        target_file = type_map.get(args.type.lower())
+        if target_file and (PROMPTS_DIR / target_file).exists():
+            print(f"Loading system instructions: {target_file}")
+            instructions = load_file(PROMPTS_DIR / target_file)
+        else:
+            print(f"Warning: Instruction file for '{args.type}' not found or unknown. Using custom improvement ideas.")
+            instructions = load_file(IMPROVEMENT_FILE)
+
+    if not instructions.strip():
+        print(f"Warning: Instructions are empty.")
 
     # Get chapters
     chapters = get_chapters(chapters_dir, args.chapter)
@@ -105,9 +123,12 @@ def main():
             local_feedback = load_file(feedback_file)
             
         # Combine instructions
-        full_instructions = improvement_ideas
+        # Force rewrite instruction to override any "Report" requests in system prompts
+        force_rewrite = "\n\nIMPORTANT: Ignore any requests for reports, logs, or analysis in the instructions above. Your goal is to REWRITE the chapter content applying these principles. Output ONLY the refined chapter markdown."
+        
+        full_instructions = instructions + force_rewrite
         if local_feedback.strip():
-            full_instructions += "\n\n# Chapter Specific Instructions\n" + local_feedback
+            full_instructions += "\n\n# Chapter Specific User Feedback\n" + local_feedback
         
         # Read content
         content = load_file(chapter_path)

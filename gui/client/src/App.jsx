@@ -20,6 +20,11 @@ function App() {
   const [isRefining, setIsRefining] = useState(false);
   const [refineOutput, setRefineOutput] = useState('');
 
+  // New World Modal State
+  const [isCreatingWorld, setIsCreatingWorld] = useState(false);
+  const [newWorldName, setNewWorldName] = useState('');
+  const [refineType, setRefineType] = useState('custom');
+
   // World State
   const [worlds, setWorlds] = useState([]);
   const [currentWorld, setCurrentWorld] = useState('default');
@@ -43,14 +48,19 @@ function App() {
     }
   };
 
-  const createWorld = async () => {
-    const name = prompt("Enter new world name (e.g. cyberpunk-baker):");
-    if (!name) return;
+  const handleCreateWorldRequest = () => {
+    setIsCreatingWorld(true);
+    setNewWorldName('');
+  };
+
+  const confirmCreateWorld = async () => {
+    if (!newWorldName.trim()) return;
     try {
-      await axios.post(`${API_BASE}/worlds`, { name });
+      await axios.post(`${API_BASE}/worlds`, { name: newWorldName });
       await fetchWorlds();
-      setCurrentWorld(name);
+      setCurrentWorld(newWorldName);
       setViewMode('builder');
+      setIsCreatingWorld(false);
     } catch (err) {
       alert("Error creating world: " + err.message);
     }
@@ -131,17 +141,31 @@ function App() {
       const res = await axios.post(`${API_BASE}/refine`, {
         chapter: selectedChapter.split('-')[0].replace('CH', ''),
         model: 'gemini',
-        world: currentWorld
+        world: currentWorld,
+        type: refineType
       });
 
       if (res.data.status === 'ok') {
-        setRefineOutput('Refinement Complete!\nCheck chapters/refined/ folder.');
+        setRefineOutput('Refinement Complete! Updating view...');
+
+        // Auto-load the refined version
+        try {
+          // Filename usually matches, just in refined/ subdir
+          const refinedFilename = `refined/${selectedChapter}`;
+          const refinedRes = await axios.get(`${API_BASE}/chapters/${refinedFilename}`, { params: { world: currentWorld } });
+          setContent(refinedRes.data.content);
+          setRefineOutput(`Refinement Complete! Now viewing refined version.`);
+        } catch (loadErr) {
+          console.error("Could not load refined file", loadErr);
+          setRefineOutput('Refinement Complete, but could not auto-load. Check chapters/refined/ folder.');
+        }
       } else {
         setRefineOutput(`Error:\n${res.data.output}`);
       }
     } catch (err) {
       setRefineOutput(`Error: ${err.message}`);
     } finally {
+      setIsGenerating(false); // Using generic loading state if available, but here it's isRefining
       setIsRefining(false);
     }
   };
@@ -159,7 +183,7 @@ function App() {
         <div className="world-select">
           <select value={currentWorld} onChange={(e) => {
             if (e.target.value === 'NEW') {
-              createWorld();
+              handleCreateWorldRequest();
             } else {
               setCurrentWorld(e.target.value);
             }
@@ -266,6 +290,21 @@ function App() {
                 placeholder="What should be improved in this chapter?"
                 disabled={!selectedChapter}
               />
+              <div style={{ margin: '10px 0' }}>
+                <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>Refinement Pass</label>
+                <select
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', background: 'var(--bg-secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                  value={refineType}
+                  onChange={(e) => setRefineType(e.target.value)}
+                >
+                  <option value="custom">Custom (Use Global Feedback)</option>
+                  <option value="writer">Writer Pass (Creative Rewrite)</option>
+                  <option value="cc">Continuity Check (CC)</option>
+                  <option value="se">Style Edit (SE)</option>
+                  <option value="qa">Quality Assurance (QA)</option>
+                  <option value="po">Product Review (PO)</option>
+                </select>
+              </div>
               <div className="actions">
                 <button className="secondary-btn" onClick={saveFeedback} disabled={!selectedChapter}>
                   <Save size={16} /> Save Notes
@@ -282,6 +321,27 @@ function App() {
             </div>
           )}
         </aside>
+      )}
+
+      {/* Create World Modal */}
+      {isCreatingWorld && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Create New World</h3>
+            <input
+              autoFocus
+              type="text"
+              placeholder="World Name (e.g. sci-fi-city)"
+              value={newWorldName}
+              onChange={e => setNewWorldName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && confirmCreateWorld()}
+            />
+            <div className="modal-actions">
+              <button className="secondary-btn" onClick={() => setIsCreatingWorld(false)}>Cancel</button>
+              <button className="primary-btn" onClick={confirmCreateWorld}>Create World</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
