@@ -1,0 +1,48 @@
+{
+    "title": "The Coder and the Compass",
+    "characters": [
+        {
+            "name": "Elara Voss",
+            "role": "Protagonist",
+            "tags": [
+                "Systems Architect"
+            ],
+            "description": "Precision, speed, composure. Believes control is the only way to prevent failure."
+        },
+        {
+            "name": "Ben Calder",
+            "role": "Support",
+            "tags": [
+                "Lead Engineer"
+            ],
+            "description": "Stability-first, sensitive to critique."
+        },
+        {
+            "name": "Nexus",
+            "role": "Support",
+            "tags": [
+                "AI"
+            ],
+            "description": "Cryptic, Socratic, never lectures."
+        },
+        {
+            "name": "Patch",
+            "role": "Pet",
+            "tags": [
+                "Cat"
+            ],
+            "description": "A rescue cat. Quirks: sits on warm electronics; appears during quiet moments."
+        }
+    ],
+    "protagonist": {
+        "name": "Elara Voss",
+        "role": "Systems Architect",
+        "age": 32,
+        "signature": "Precision, speed, composure.",
+        "flaw": "Believes control is the only way to prevent failure."
+    },
+    "setting": "High-stakes tech company in a financial district. Glass walls, cold amber lights.",
+    "theme": "The shift from rigid control to fluid integration.",
+    "glitch_concept": "A sync error in Node 04 that mirrors the protagonist's internal conflict.",
+    "timeline_length_weeks": 4
+}

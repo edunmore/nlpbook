@@ -1,0 +1,28 @@
+# Chapter Map (Proposed)
+
+- CH001: **The Glitch in the System** — Kickoff derails; Elara tightens control; Nexus asks one question and assigns a tiny experiment.
+- CH002: **Wide Eyes** — Perception widens; Elara notices context, not just content; first small reduction in friction.
+- CH003: **The Email That Cuts** — A “perfect” email lands as accusation; Elara repairs with a different entry stance.
+- CH004: **The Learning State** — Elara notices she repeats under stress; Nexus gives a short pre-conversation ritual.
+- CH005: **The Room’s Temperature** — A team sync turns icy; Elara finds a sentence that lowers defenses.
+- CH006: **The Body’s Vote** — Elara treats sensations as telemetry; catches escalation earlier.
+- CH007: **The First Small Repair** — Elara and Ben align on stability vs speed; trust increases slightly.
+- CH008: **The Demo That Fails** — Rehearsal outage; Nexus forces Elara out of binary thinking.
+- CH009: **The Word ‘Must’** — One word traps the room; Elara rewrites a request to create room to move.
+- CH010: **The Time Trap** — Deadline turns monstrous; Nexus breaks inevitability with a time-shift experiment.
+- CH011: **The Old Decision** — Elara discovers an old rule; proceeds with incomplete info carefully.
+- CH012: **The Hidden Part** — Competing inner motives show up as behavior; Elara negotiates through actions.
+- CH013: **The Question That Presumes Tomorrow** — A question quietly assumes change is possible; Ben softens.
+- CH014: **The Four Corners** — A dilemma yields a third option through structured perspective shifts.
+- CH015: **The Argument That Isn’t About the Argument** — A config fight is about trust; one clean question changes it.
+- CH016: **The Pattern Interrupt** — Elara breaks a loop by changing rhythm/location mid-escalation.
+- CH017: **The Client Escalation** — External pressure spikes; Elara holds steadier; Nexus is mostly silent.
+- CH018: **The Near Miss** — A serious failure reveals a hidden assumption; team reality diverges.
+- CH019: **The Apology Without Collapse** — Elara apologizes cleanly; repair lands; intimacy rises.
+- CH020: **The Meeting as Weather** — Elara reads the room early; the team mirrors her steadiness.
+- CH021: **The Space Between Words** — Small phrasing shifts change experience; shown via scenes.
+- CH022: **The Decision That Dissolves** — A rigid decision loosens under questions; a new path appears.
+- CH023: **A Different Kind of Change** — Elara changes her days and recovery habits; shown, not declared.
+- CH024: **Ben’s Chapter** — Partial POV shift; Ben’s internal logic becomes visible; deeper empathy.
+- CH025: **Launch Night** — Go-live under tension; not perfect, but real teamwork.
+- CH026: **The Cursor Blinks** — Aftermath; Nexus asks one last question; Elara answers differently.

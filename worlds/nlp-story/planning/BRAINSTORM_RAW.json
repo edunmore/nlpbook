@@ -1,0 +1,38 @@
+[
+  {
+    "concept": "The benevolent manipulator",
+    "nlp_source": "Trainer's Ulterior Motive / Transformation vs. Teaching",
+    "description": "A mentor figure who isn't just teaching skills but is actively, perhaps secretly, dismantling and rebuilding the protagonist's personality through conversation. The tension comes from the protagonist wondering if they are being helped or brainwashed.",
+    "scene_idea": "A casual coffee break where the senior partner asks a seemingly innocent question that unravels the protagonist's confidence in a specific belief, leaving them confused but strangely liberated.",
+    "source_file": "NLP  01a-Introduction, communication model, learning state.txt",
+    "rating": 5,
+    "approved": true
+  },
+  {
+    "concept": "The isolation of unexplainable insight",
+    "nlp_source": "Inability to explain NLP (The 'Mother' test)",
+    "description": "The protagonist gains a new way of seeing the world (the 'invisible thread') but finds themselves unable to describe it to loved ones without sounding crazy or pretentious. This creates a wedge in their personal relationships.",
+    "scene_idea": "A dinner scene with a spouse or parent where the protagonist tries to explain their new success at work, but the explanation is met with blank stares or mockery ('So you just... talk to them?').",
+    "source_file": "NLP  01a-Introduction, communication model, learning state.txt",
+    "rating": 0,
+    "approved": false
+  },
+  {
+    "concept": "The trap of technical exclusivity",
+    "nlp_source": "The 'Neuro-Linguistic Programming' label problem",
+    "description": "The realization that using specific, 'insider' language actually pushes people away rather than drawing them in. The protagonist tries to impress a client with their new framework but instead alienates them.",
+    "scene_idea": "A client pitch where the protagonist uses a specific phrase they think is profound, but the client recoils, viewing it as corporate gibberish or manipulation, instantly cooling the room.",
+    "source_file": "NLP  01a-Introduction, communication model, learning state.txt",
+    "rating": 0,
+    "approved": false
+  },
+  {
+    "concept": "Seeing the machinery behind the curtain",
+    "nlp_source": "Processing experience through five senses / Nervous system operations",
+    "description": "The protagonist stops listening to the *content* of conversations and starts obsessing over the *mechanics* (breathing rates, eye movements, tone), making them effective at their job but disconnected from genuine human connection.",
+    "scene_idea": "During a friend's emotional breakup story, the protagonist catches themselves analyzing the friend's gestures instead of offering comfort, realizing they are treating a loved one like a data set.",
+    "source_file": "NLP  01a-Introduction, communication model, learning state.txt",
+    "rating": 0,
+    "approved": false
+  }
+]

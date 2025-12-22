@@ -1,0 +1,13 @@
+{
+    "title": "The Quantum Mind",
+    "theme": "Applying NLP to solve a mystery",
+    "setting": "A futuristic detective agency",
+    "source_path": "NLP",
+    "characters": [
+        {
+            "name": "Detective Arrow",
+            "role": "Protagonist",
+            "description": "A sharp detective who uses linguistics to solve crimes."
+        }
+    ]
+}

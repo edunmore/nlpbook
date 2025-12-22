@@ -1,0 +1,49 @@
+{
+  "title": "coaching",
+  "characters": [
+    {
+      "name": "The coaching lady",
+      "role": "Protagonist",
+      "description": "a pretty woman in her 40s, string business and marketing background, some coaching experience, starting her new carrer as a self employed business coach.. ",
+      "tags": []
+    },
+    {
+      "name": "The coaching app",
+      "role": "Other",
+      "description": "an application which plays the role of our yoda like persona helping without direct interfering",
+      "tags": []
+    },
+    {
+      "name": "Marcus Sterling",
+      "role": "Antagonist",
+      "tags": [
+        "Rival",
+        "Guru",
+        "Aggressive"
+      ],
+      "description": "A slick, charismatic 'high-ticket' sales guru who embodies the toxic side of the industry. He believes in aggressive closing techniques and '10x growth' at all costs, viewing the protagonist's empathetic, value-driven approach as weak. He frequently tries to poach her potential clients with flashy promises of instant wealth."
+    },
+    {
+      "name": "Leo 'Pixel' Vance",
+      "role": "Client",
+      "tags": [
+        "Creative",
+        "Chaotic",
+        "Early Adopter"
+      ],
+      "description": "A brilliant but hopelessly disorganized digital artist trying to turn his passion into a legitimate business. He is the protagonist's first major client, constantly challenging her structured marketing background with his spontaneous bursts of creativity, refusal to use spreadsheets, and tendency to disappear into 'flow states' for days."
+    },
+    {
+      "name": "Sarah Jenkins",
+      "role": "Confidante",
+      "tags": [
+        "Skeptic",
+        "Corporate",
+        "Grounding"
+      ],
+      "description": "The protagonist's former corporate manager and best friend who thinks leaving a stable salary was a midlife crisis. She constantly sends the protagonist job openings 'just in case' and represents the alluring pull of safety and the 'golden handcuffs' the protagonist is trying to escape."
+    }
+  ],
+  "setting": "",
+  "theme": ""
+}

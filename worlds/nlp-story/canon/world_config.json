@@ -1,0 +1,19 @@
+{
+  "title": "The Invisible Thread",
+  "theme": "A person learns to see what was always there",
+  "setting": "A small consulting firm in a modern city",
+  "source_path": "NLP",
+  "workflow_stage": "map_generate",
+  "characters": [
+    {
+      "name": "Maya Chen",
+      "role": "Protagonist",
+      "description": "A brilliant but rigid project manager who believes everything can be solved with logic and spreadsheets."
+    },
+    {
+      "name": "The Mentor",
+      "role": "Guide",
+      "description": "A quiet, observant senior consultant who notices patterns others miss."
+    }
+  ]
+}
