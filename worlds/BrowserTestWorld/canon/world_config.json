@@ -1,0 +1,60 @@
+{
+  "title": "BrowserTestWorld",
+  "characters": [
+    {
+      "name": "Alex Chen",
+      "role": "Protagonist",
+      "tags": [
+        "Observant",
+        "Tech-savvy",
+        "Restless"
+      ],
+      "description": "A junior systems architect for the city's municipal data center who feels suffocated by the flawless perfection of The Mesh. Alex is the only person who successfully recorded the raw Desync data before the system wiped the anomaly, making them a target."
+    },
+    {
+      "name": "Dr. Elara Vance",
+      "role": "Mentor",
+      "tags": [
+        "Reclusive",
+        "Brilliant",
+        "Paranoid"
+      ],
+      "description": "One of the original architects of The Mesh who vanished from public life a decade ago after realizing the system's potential for control. She now operates from the shadows, communicating via obsolete analog radio frequencies to guide Alex on how to perceive the world without the digital overlay."
+    },
+    {
+      "name": "Director Kaelen Voss",
+      "role": "Antagonist",
+      "tags": [
+        "Charismatic",
+        "Ruthless",
+        "Order-obsessed"
+      ],
+      "description": "The enigmatic head of 'Synapse', the corporation responsible for maintaining The Mesh. Voss firmly believes that the illusion is the only thing holding society together and views any breach of the system not just as a crime, but as an existential threat to human survival."
+    },
+    {
+      "name": "Jules 'Glitch' Kovic",
+      "role": "Ally / Wildcard",
+      "tags": [
+        "Anarchist",
+        "Hacker",
+        "Unpredictable"
+      ],
+      "description": "A guerrilla street artist who exploits vulnerabilities in local AR nodes to display digital graffiti that the system struggles to delete. Jules wants to tear The Mesh down completely to force people to face reality, regardless of the chaos such a collapse would cause."
+    },
+    {
+      "name": "Marcus Reed",
+      "role": "Skeptic",
+      "tags": [
+        "Loyal",
+        "Grounded",
+        "Fearful"
+      ],
+      "description": "Alex's childhood friend and a high-ranking officer in the city's digital security force. Marcus represents the seductive comfort of the status quo and finds himself torn between his sworn duty to Synapse and his loyalty to Alex."
+    }
+  ],
+  "setting": "Veridia Bay, a hyper-connected near-future metropolis where a ubiquitous Augmented Reality overlay known as 'The Mesh' beautifies every aspect of urban life, concealing the decay of the physical world beneath a veneer of shimmering digital perfection.",
+  "theme": "The shattering of convenient illusions and the cost of truth in a curated reality, exploring whether humanity prefers a beautiful lie to an ugly truth.",
+  "source_path": "NLP",
+  "workflow_stage": "brainstorm",
+  "glitch_concept": "The Desync: During a routine firmware update for the city's optical implants, the protagonist witnesses 'The Mesh' flicker and fail for exactly three seconds. This brief interruption reveals a gray, crumbling city and subliminal obedience commands hidden in vibrant advertisements\u2014a reality no one else seems to remember."
+}
