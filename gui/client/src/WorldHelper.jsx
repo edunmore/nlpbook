@@ -10,6 +10,8 @@ function WorldHelper({ currentWorld }) {
     const [loading, setLoading] = useState(false);
     const [generating, setGenerating] = useState(false);
     const [logs, setLogs] = useState([]);
+    const [timeline, setTimeline] = useState('');
+
 
     // Log Polling
     useEffect(() => {
@@ -34,6 +36,7 @@ function WorldHelper({ currentWorld }) {
             if (success) {
                 setGenerating(false);
                 fetchConfig();
+                fetchTimeline();
             }
         } catch (e) {
             console.error("Log error", e);
@@ -42,7 +45,21 @@ function WorldHelper({ currentWorld }) {
 
     useEffect(() => {
         fetchConfig();
+        fetchTimeline();
     }, [currentWorld]);
+
+    const fetchTimeline = async () => {
+        try {
+            const res = await axios.get(`${API_BASE}/steering/content`, {
+                params: { category: 'canon', filename: 'TIMELINE.md', world: currentWorld }
+            });
+            setTimeline(res.data.content);
+        } catch (err) {
+            // It's okay if it doesn't exist yet
+            setTimeline('');
+        }
+    };
+
 
     const fetchConfig = async () => {
         setLoading(true);
@@ -62,7 +79,19 @@ function WorldHelper({ currentWorld }) {
     const saveConfig = async () => {
         try {
             await axios.post(`${API_BASE}/world-config`, config, { params: { world: currentWorld } });
-            alert('World Config Saved!');
+
+            // Also save timeline if it exists
+            if (timeline) {
+                await axios.post(`${API_BASE}/steering/content`, {
+                    category: 'canon',
+                    filename: 'TIMELINE.md',
+                    content: timeline,
+                    world: currentWorld
+                });
+            }
+
+            alert('World Config & Timeline Saved!');
+
         } catch (err) {
             console.error(err);
             alert('Error saving config');
@@ -252,6 +281,17 @@ function WorldHelper({ currentWorld }) {
                         onChange={(e) => updateField('chapter_count', parseInt(e.target.value))}
                         min={1}
                         max={99}
+                    />
+                </div>
+
+                <div className="form-group full-width">
+                    <label>Storyline / Timeline (Generated)</label>
+                    <textarea
+                        rows={10}
+                        value={timeline}
+                        onChange={(e) => setTimeline(e.target.value)}
+                        placeholder="Generate a storyline to see the timeline here..."
+                        style={{ fontFamily: 'monospace', fontSize: '13px' }}
                     />
                 </div>
             </div>
