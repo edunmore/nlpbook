@@ -15,14 +15,11 @@ from pathlib import Path
 
 # Add scripts dir to python path to import agent_utils
 sys.path.append(str(Path(__file__).resolve().parent))
-from agent_utils import run_agent
+from agent_utils import run_agent, load_prompt
 
 # Configuration
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 WORLDS_DIR = WORKSPACE_ROOT / "worlds"
-PROMPTS_DIR = WORKSPACE_ROOT / "prompts"
-IMPROVEMENT_FILE = PROMPTS_DIR / "IMPROVEMENT_IDEAS.md"
-TEMPLATE_FILE = PROMPTS_DIR / "REFINE_CHAPTER.md"
 
 def load_file(path):
     try:
@@ -48,10 +45,13 @@ def get_chapters(chapters_dir, filter_chapter=None):
         
     return files
 
-def construct_prompt(chapter_content, improvement_ideas, chapter_num):
-    template = load_file(TEMPLATE_FILE)
+def construct_prompt(chapter_content, improvement_ideas, chapter_num, world_dir):
+    template = load_prompt(world_dir, "REFINE_CHAPTER.md")
+    if not template:
+        print("Error: Could not load REFINE_CHAPTER.md template")
+        sys.exit(1)
+        
     prompt = template.replace("{{CHAPTER_CONTENT}}", chapter_content)
-    # prompt = template.replace("{{CHAPTER_CONTENT}}", chapter_content) # Removed duplicate call
     prompt = prompt.replace("{{IMPROVEMENT_IDEAS}}", improvement_ideas)
     prompt = prompt.replace("{{CHAPTER_NUM}}", chapter_num)
     return prompt
@@ -77,7 +77,7 @@ def main():
     # Load instructions based on type
     instructions = ""
     if args.type.lower() == "custom":
-        instructions = load_file(IMPROVEMENT_FILE)
+        instructions = load_prompt(world_dir, "IMPROVEMENT_IDEAS.md")
     else:
         type_map = {
             "writer": "WRITER_INSTRUCTIONS.md",
@@ -87,12 +87,12 @@ def main():
             "po": "PO_INSTRUCTIONS.md"
         }
         target_file = type_map.get(args.type.lower())
-        if target_file and (PROMPTS_DIR / target_file).exists():
+        if target_file:
             print(f"Loading system instructions: {target_file}")
-            instructions = load_file(PROMPTS_DIR / target_file)
+            instructions = load_prompt(world_dir, target_file)
         else:
-            print(f"Warning: Instruction file for '{args.type}' not found or unknown. Using custom improvement ideas.")
-            instructions = load_file(IMPROVEMENT_FILE)
+            print(f"Warning: Instruction file for '{args.type}' unknown. Using custom improvement ideas.")
+            instructions = load_prompt(world_dir, "IMPROVEMENT_IDEAS.md")
 
     if not instructions.strip():
         print(f"Warning: Instructions are empty.")
@@ -113,7 +113,10 @@ def main():
         print(f"\nProcessing {chapter_name}...")
         
         # Extract number
-        chapter_num = chapter_name.split("-")[0].replace("CH", "")
+        # Assuming format CHxxx-Title.md or CHxxx.md
+        import re
+        match = re.search(r"CH(\d+)", chapter_name)
+        chapter_num = match.group(1) if match else "000"
         
         # Check for specific feedback file
         feedback_file = chapters_dir / "meta" / f"{chapter_name}.feedback.md"
@@ -134,7 +137,7 @@ def main():
         content = load_file(chapter_path)
         
         # Construct prompt
-        prompt = construct_prompt(content, full_instructions, chapter_num)
+        prompt = construct_prompt(content, full_instructions, chapter_num, world_dir)
         
         # Run agent
         task_name = f"refine_{chapter_name.replace('.md', '')}"
