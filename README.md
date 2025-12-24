@@ -6,12 +6,15 @@ A comprehensive GUI-driven system for writing novels with AI assistance. It feat
 
 ### 1. World Builder
 - **Custom Worlds**: Create unlimited isolated project environments (worlds).
-- **AI Auto-Correction**: Use the "Auto-Generate (AI)" button to fill in world details (Theme, Setting, Glitch) based on natural language instructions.
-- **Canon Management**: Automatically inherits style guides and rules while maintaining world-specific bibles.
+- **Foundation Protocol (V2)**: Uses the "4-Agent Protocol" (Genesis, Psyche, Embodiment, Crucible) to build deep character psychology and plot dynamics.
+- **Auto-Correction**: Use the "Auto-Generate (AI)" button to fill in world details.
+- **Canon Management**: Inherits style guides while maintaining world-specific bibles like `02_CHARACTER_PROFILE/`.
 
 ### 2. Planning Workflow
-- **Brainstorming**: Ingests source material (e.g., local text files) to generate unique story concepts.
-- **Chapter Map**: Generates high-level outlines based on approved concepts.
+- **Alchemy of Character**: Ingests source material via `analyze_source.py` to generate unique narrative DNA (`AGENCY_ANALYZER`).
+- **Chapter Map**: Generates high-level outlines based on the "Ghost" and "Lie" character arcs.
+- **Chapter Cards**: Creates detailed beat sheets.
+- **Prompt Editor**: Edit underlying prompts (Genesis, Writer, etc.) directly in the GUI.
 - **Chapter Cards**: Creates detailed beat sheets for each chapter.
 - **Visual Review**: Drag-and-drop or rating-based review system for all planning artifacts.
 

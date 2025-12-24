@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import { Star, Trash2, Plus, Check, ChevronRight, Sparkles, FileText, Map, BookOpen } from 'lucide-react';
+import { Star, Trash2, Plus, Check, ChevronRight, Sparkles, FileText, Map, BookOpen, Edit3 } from 'lucide-react';
 import './WorkflowPanel.css';
+import PromptModal from './PromptModal';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -18,6 +20,8 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
     const [genOutput, setGenOutput] = useState('');
     const [config, setConfig] = useState({});
     const [newConcept, setNewConcept] = useState({ concept: '', nlp_source: '', description: '', scene_idea: '' });
+    const [promptModalOpen, setPromptModalOpen] = useState(false);
+    const [selectedPrompt, setSelectedPrompt] = useState(null);
 
     useEffect(() => {
         loadConfig();
@@ -172,6 +176,14 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
         );
     };
 
+    const generateDidactic = () => {
+        runGenerationTask(
+            'Phoenix Fable Generation',
+            () => axios.post(`${API_BASE}/generate/didactic`, { world: currentWorld }),
+            () => { loadChapters(); } // It generates chapters/drafts, so reloading chapters might be relevant, or just logs.
+        );
+    };
+
     const saveChapterMap = async () => {
         try {
             await axios.post(`${API_BASE}/chapter-map`, chapterMap, {
@@ -207,6 +219,11 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
             () => axios.post(`${API_BASE}/generate/chapters`, { world: currentWorld, count: 1, start: nextNum }),
             () => { loadChapters(); if (onRefresh) onRefresh(); }
         );
+    };
+
+    const openPromptEditor = (filename) => {
+        setSelectedPrompt(filename);
+        setPromptModalOpen(true);
     };
 
     const renderStars = (rating, index) => {
@@ -254,6 +271,16 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
                         <div className="section-actions">
                             <button onClick={generateBrainstorm} disabled={isGenerating} className="secondary-btn">
                                 <Sparkles size={14} /> Generate from Source
+                            </button>
+                            <button className="icon-btn" title="Edit Analyzer Prompt" onClick={() => openPromptEditor('AGENT_ANALYZER.md')}>
+                                <Edit3 size={14} />
+                            </button>
+                            <div className="separator-vertical"></div>
+                            <button onClick={generateDidactic} disabled={isGenerating} className="secondary-btn" title="Generate Recursive Fable from Source">
+                                <BookOpen size={14} /> Generate Fable (Phoenix)
+                            </button>
+                            <button className="icon-btn" title="Edit Architect Prompt" onClick={() => openPromptEditor('AGENT_DIDACTIC_ARCHITECT.md')}>
+                                <Edit3 size={14} />
                             </button>
                         </div>
                     </div>
@@ -392,6 +419,9 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
                             <button onClick={generateNextChapter} disabled={isGenerating} className="secondary-btn">
                                 <BookOpen size={14} /> Generate Next Chapter
                             </button>
+                            <button className="icon-btn" title="Edit Writer Prompt" onClick={() => openPromptEditor('WRITER_SCENE_SEQUEL.md')}>
+                                <Edit3 size={14} />
+                            </button>
                         </div>
                     </div>
 
@@ -416,6 +446,13 @@ function WorkflowPanel({ currentWorld, onRefresh }) {
                     <pre>{genOutput}</pre>
                 </div>
             )}
+
+            <PromptModal
+                isOpen={promptModalOpen}
+                onClose={() => setPromptModalOpen(false)}
+                world={currentWorld}
+                filename={selectedPrompt}
+            />
         </div>
     );
 }

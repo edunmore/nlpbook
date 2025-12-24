@@ -1,58 +1,58 @@
-# Agent Protocols
+# Agent Protocols (V2)
 
-## Secure State Protocol
-At the beginning of each session or major task:
+## 1. 4-Agent Foundation Protocol
+The V2 engine uses four specialized agents to build the narrative foundation.
+These prompts are located in `prompts/` and are fully editable via the GUI ("Configure Agents").
 
-1.  **Commit Everything**: Ensure all pending changes are committed to the current branch.
-2.  **Secure State Branch**: Create a new branch to work on.
-    -   **Naming Convention**: `session/<YYYY-MM-DD>_<TOPIC>`
-    -   Example: `session/2025-12-23_refine_workflow`
-3.  **Documentation**: Update this file if new protocols are established.
+### 🧬 Genesis (The Architect)
+- **Role**: Distills source material into a core narrative identity.
+- **Output**: `01_STORY_GENESIS/01_LOGLINE_AND_ARC.md`
+- **Key Responsibility**: Establishing the "Narrative spine" and the protagonist's core arc.
 
-## 🚨 Critical System Constraints
-**Filesystem Limitations**: The project lives on a mounted drive (`/media/mac/projects/nlpbook`) that **does not support execution or symlinks** for certain binaries (causing `Exec format error`).
-**Solution**: We run the app from a **Shadow Workspace** at `/home/mac/.gemini/shadow_workspace`.
+### 🧠 Psyche (The Psychologist)
+- **Role**: Defines the internal landscape of the character.
+- **Output**: `02_CHARACTER_PROFILE/01_INTERNAL_PSYCHE.md`
+- **Key Concepts**:
+    - **Ghost**: A past trauma haunting the character.
+    - **Lie**: A misconception about the world born from the Ghost.
+    - **Need**: The truth the character must learn to overcome the Lie.
 
-## 🚀 Session Startup Guide
-1. **Sync Code**: Ensure the shadow workspace has the latest code.
-   ```bash
-   # Update shadow code (excluding heavy dirs)
-   cp -r /media/mac/projects/nlpbook/{gui,scripts,prompts,process,README.md} /home/mac/.gemini/shadow_workspace/
-   # Ensure worlds are symlinked (only needs to happen once, but harmless to check)
-   ln -s /media/mac/projects/nlpbook/worlds /home/mac/.gemini/shadow_workspace/worlds
-   ```
-2. **Start Backend**:
-   ```bash
-   cd /home/mac/.gemini/shadow_workspace
-   source venv/bin/activate
-   python gui/backend/main.py
-   ```
-3. **Start Frontend**:
-   ```bash
-   cd /home/mac/.gemini/shadow_workspace/gui/client
-   npm run dev
-   ```
+### 👤 Embodiment (The Actor)
+- **Role**: Translates internal traits into external reality.
+- **Output**: `02_CHARACTER_PROFILE/02_EXTERNAL_EMBODIMENT.md`
+- **Responsibility**: Defining voice, appearance, sensory details, and quirks.
 
-## 🛠️ Development Workflow
-**Editing Code**:
-1. Edit files in the **Original Project Directory** (`/media/mac/projects/nlpbook/...`).
-2. **Immediately copy** the modified file to the shadow workspace to apply changes.
-   `cp /path/to/original /home/mac/.gemini/shadow_workspace/path/to/shadow`
-3. Verify in browser.
+### 🔥 Crucible (The Director)
+- **Role**: Sets the stage and the stakes.
+- **Output**: `01_STORY_GENESIS/02_CRUCIBLE_AND_CAST.md`
+- **Key Responsibility**: Defining the Inciting Incident, Antagonist, and the "Midpoint" turning point.
 
-## 🧩 Template System & Decentralized Prompts
+---
+
+## 2. Recursive Drafting Protocol
+### ✍️ Writer (The Drafter)
+- **Prompt**: `WRITER_SCENE_SEQUEL.md`
+- **Methodology**: Writes in "Scene" (Action) and "Sequel" (Reflection) pairs.
+- **State Management**: Reads and updates a `[STORY_STATE]` block at the end of every chapter to maintain continuity across context windows.
+
+---
+
+---
+
+## 3. Technical Reference
+**System Architecture**:
+- **Backend**: Python (FastAPI) on port 8000.
+- **Frontend**: Vite (React) on port 5173.
+- **Filesystem**: Project lives on exFAT mount. No symlinks or execution bits allowed.
+- **Execution**: Frontend must be run via `node` directly (`node node_modules/vite/bin/vite.js`).
+
+## 🧩 Template System
 **New World Creation**:
 - All new worlds are clones of `worlds/NEWORLDTEMPLATE`.
-- **Canon**: `world_config.json`, `SERIES_BIBLE.md` etc are copied from the template.
-- **Prompts**: `prompts/` and `process/` are copied to `worlds/[WorldName]/prompts/`.
-- **Customization**: You can edit `worlds/[WorldName]/prompts/WRITER_INSTRUCTIONS.md` to change the AI's behavior *only for that world*.
+- **Canon**: `world_config.json`, `SERIES_BIBLE.md`.
+- **Prompts**: Editable copies of Genesis, Psyche, etc., are placed in `worlds/[WorldName]/prompts/`.
 
-## 🤖 Gemini Context Scoping
-The `gemini` CLI is always executed with `cwd = worlds/[CurrentWorld]`.
-- **Visibility**: The agent sees `canon/`, `chapters/`, and `Gemini.md` in the root.
-- **Prompt Loading**: Scripts prioritize `worlds/[World]/prompts/[File]` over global defaults.
-- **Gemini.md**: A file in the world root that gives the agent context about its role and file structure.
-
-## 🧠 Solved Issues (Memory)
-- **Storyline UI**: The "Storyline / Timeline" textarea was missing. Fixed in `WorldHelper.jsx` by adding a dedicated textarea bound to `TIMELINE.md` steering content.
-- **Frontend/Backend Paths**: Frontend runs on :5173, Backend on :8000. Backend serves files from `worlds/`.
+## 🤖 Gemini Context
+The `gemini` CLI is executed with `cwd = worlds/[CurrentWorld]`.
+- **Visibility**: The agent sees `canon/`, `chapters/`, and `Gemini.md`.
+- **Priority**: World-specific prompts override global defaults.

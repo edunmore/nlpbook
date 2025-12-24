@@ -1,50 +1,43 @@
-# Quick Reference Card - BookAgent GUI
+# Quick Reference Card - BookAgent GUI (V2)
 
-## 🚀 Essential GUI Commands
+## 🚀 Essential Activity
 
-### Start the System
+### Startup
 1. **Backend**: `source gui/backend/venv/bin/activate && python gui/backend/main.py`
-2. **Frontend**: `cd gui/client && npm run dev`
+2. **Frontend**: `cd gui/client && node node_modules/vite/bin/vite.js`
 3. **Visit**: `http://localhost:5173`
 
-### World Management
-- **New World**: Click dropdown -> `+ New World`.
-- **Auto-Generate**: Use `AI: [instruction]` in Theme/Glitch fields and click **Auto-Generate (AI)**.
+### World & Agent Config
+- **New World**: `+ New World` from dropdown.
+- **Configure Agents**: Next to "Auto-Generate", click **Genesis**, **Psyche**, etc. to edit their prompts.
+- **Prompt Editor**: Click the **Edit (pencil)** icon to customize AI instructions for that specific world.
 
-### Planning Pipeline
-- **Brainstorm**: In the Planning tab, click **Generate from Source**.
-- **Rate**: Approving concepts requires a **3+ star** rating.
-- **Refresh**: The GUI auto-updates once Agent tasks finish (via log polling).
-
----
-
-## 📂 File Structure
-
-| Folder | Contents |
-|--------|----------|
-| `worlds/` | All projects (worlds) |
-| `worlds/[name]/canon/` | World configuration and Bibles |
-| `worlds/[name]/chapters/` | Drafted chapter prose |
-| `worlds/[name]/planning/` | Brainstorms, Maps, and Cards |
-| `prompts/` | AI system instructions |
-| `gui/` | Backend and Frontend code |
+### Planning Pipeline (Alchemy)
+1. **Source**: Ingest text files via "Generate from Source" (Edit `AGENT_ANALYZER` first!).
+2. **Brainstorm**: Approve concepts (3+ stars).
+3.  **Map & Cards**: Generate outlines and beat sheets.
 
 ---
 
-## 🛠️ Advanced (CLI)
+## 📂 File Structure (V2)
 
-> [!NOTE]
-> The GUI is the preferred interface. Use these CLI tools only for debugging.
+| Folder                    | Contents                                          |
+| ------------------------- | ------------------------------------------------- |
+| `worlds/[name]/prompts/`  | **User-Editable Prompts** (Genesis, Writer, etc.) |
+| `worlds/[name]/canon/`    | `01_STORY_GENESIS`, `02_CHARACTER_PROFILE`        |
+| `worlds/[name]/chapters/` | Drafted & Refined Prose                           |
+| `worlds/[name]/planning/` | Brainstorms, Maps, Cards                          |
 
-```bash
-# Refine a specific chapter manually
-python scripts/refine_chapters.py --world [name] --chapter [num] --type writer
+---
 
-# Generate a storyline/timeline
-python scripts/generate_storyline.py --world [name]
-```
+## 🛠️ Agents (V2)
+- **Genesis**: Logline & Arc.
+- **Psyche**: Ghost, Lie, Need.
+- **Embodiment**: Voice & Appearance.
+- **Crucible**: Plot Stakes.
+- **Writer**: Recursive Scene/Sequel drafting.
 
 ## 📄 Documentation
-- `README.md` - Setup and feature overview.
-- `GUI_WORKFLOW.md` - Step-by-step visual guide.
-- `archive/` - Legacy CLI documentation.
+- `README.md` - System Overview.
+- `GUI_WORKFLOW.md` - Visual User Guide.
+- `AGENTS.md` - Technical Protocol Reference.

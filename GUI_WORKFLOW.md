@@ -20,9 +20,22 @@ This guide documents the end-to-end workflow for creating and refining a book us
 ## 2. Planning Phase
 Navigate to the **Planning Workflow** tab to generate the foundation of your story.
 
-1.  **Brainstorm**: Generate initial concepts, themes, and characters.
-2.  **Chapter Map**: Create a high-level outline of chapters.
-3.  **Chapter Cards**: Generate detailed beats for each chapter.
+1.  **Alchemy (Source)**: Click "Generate from Source" to ingest local text files.
+    *   *Tip*: Click the **Edit (pencil)** icon to customize the `AGENT_ANALYZER` prompt before generating.
+2.  **Brainstorm**: Review and approve concepts.
+3.  **Chapter Map**: Create a high-level outline of chapters.
+4.  **Chapter Cards**: Generate detailed beats for each chapter.
+
+---
+
+## 3. World & Agent Configuration (V2)
+The V2 engine uses 4 specific agents (Genesis, Psyche, Embodiment, Crucible) to build your world's canon.
+
+1.  Go to **World Builder**.
+2.  Locate the **Configure Agents** section (next to "Auto-Generate").
+    ![Configure Agents](/home/mac/.gemini/antigravity/brain/1321b8c6-114b-4bbf-b35f-2a9c7b760700/.system_generated/click_feedback/click_feedback_1766586145991.png)
+3.  Click any agent (e.g., **Genesis**) to open the **Prompt Editor**.
+4.  Modify the markdown instructions and click **Save**. This permanently alters how that agent behaves for this specific world.
 
 ---
 

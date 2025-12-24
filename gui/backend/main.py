@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -308,6 +308,12 @@ def generate_storyline(req: GenerateRequest):
     cmd = [sys.executable, str(script), "--world", req.world]
     return run_script_threaded(cmd)
 
+@app.post("/api/generate/didactic")
+def generate_didactic_story(req: GenerateRequest):
+    script = WORKSPACE_ROOT / "scripts" / "generate_didactic_story.py"
+    cmd = [sys.executable, str(script), "--world", req.world, "--model", "gemini"]
+    return run_script_threaded(cmd)
+
 @app.post("/api/generate/chapters")
 def generate_chapters(req: GenerateRequest):
     script = WORKSPACE_ROOT / "scripts" / "generate_chapters.py"
@@ -328,8 +334,9 @@ def generate_cards(req: GenerateRequest):
 
 @app.post("/api/generate/brainstorm")
 def generate_brainstorm(req: GenerateRequest):
-    script = SCRIPTS_DIR / "generate_brainstorm_iterative.py"
-    cmd = [sys.executable, str(script), "--world", req.world, "--max-files", str(req.count)]
+    # REFACTOR: Now calls analyze_source.py to scan source material
+    script = WORKSPACE_ROOT / "scripts" / "analyze_source.py"
+    cmd = [sys.executable, str(script), "--world", req.world]
     return run_script_threaded(cmd)
 
 @app.post("/api/generate/map")
@@ -340,8 +347,11 @@ def generate_map(req: GenerateRequest):
 
 @app.post("/api/generate/world")
 def generate_world(req: GenerateRequest):
-    script = WORKSPACE_ROOT / "scripts" / "generate_world.py"
-    cmd = [sys.executable, str(script), "--world", req.world]
+    # REFACTOR: Now calls build_foundations.py for the full 4-agent protocol
+    script = WORKSPACE_ROOT / "scripts" / "build_foundations.py"
+    # Mapping "Auto-Generate" to the full foundation build
+    # Using 'Generic' theme if not provided (req doesn't have theme yet, but we can default)
+    cmd = [sys.executable, str(script), "--world", req.world, "--theme", "Epic Fantasy"] 
     return run_script_threaded(cmd)
 
 # --- Brainstorm Review API ---
@@ -546,6 +556,45 @@ def save_steering_content(req: SteeringFileRequest):
         f.write(req.content)
         
     return {"status": "ok", "path": str(target_path)}
+
+# --- Prompt Editor API ---
+
+@app.get("/api/prompts/content")
+def get_prompt_content(filename: str, world: str = "default"):
+    """Get the content of a specific prompt file."""
+    paths = get_world_paths(world)
+    prompt_path = paths["root"] / "prompts" / filename
+    
+    if not prompt_path.exists():
+        return {"content": "", "error": "File not found"}
+        
+    try:
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            return {"content": content, "status": "ok"}
+    except Exception as e:
+        return {"content": "", "error": str(e)}
+
+class PromptContentRequest(BaseModel):
+    world: str
+    filename: str
+    content: str
+
+@app.post("/api/prompts/content")
+def save_prompt_content(req: PromptContentRequest):
+    """Save content to a prompt file."""
+    paths = get_world_paths(req.world)
+    prompt_path = paths["root"] / "prompts" / req.filename
+    
+    # Ensure directory exists just in case
+    os.makedirs(prompt_path.parent, exist_ok=True)
+    
+    try:
+        with open(prompt_path, "w", encoding="utf-8") as f:
+            f.write(req.content)
+        return {"status": "ok"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

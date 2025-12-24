@@ -23,17 +23,8 @@ def load_prompt(world_dir, filename):
             except Exception as e:
                 print(f"Error loading world prompt {filename}: {e}")
 
-    # 2. Global Default
-    global_prompt = WORKSPACE_ROOT / "prompts" / filename
-    if global_prompt.exists():
-        print(f"Loaded global prompt: {global_prompt}")
-        try:
-            with open(global_prompt, "r", encoding="utf-8") as f:
-                return f.read()
-        except Exception as e:
-            print(f"Error loading global prompt {filename}: {e}")
-            
-    print(f"Warning: Prompt {filename} not found.")
+    # 2. No Global Default (Strict Decentralization)
+    print(f"Error: Prompt {filename} not found in {world_dir}/prompts.")
     return ""
 
 def run_agent(prompt, model="gemini", world_dir=None, task_name="agent_task", cwd=None):

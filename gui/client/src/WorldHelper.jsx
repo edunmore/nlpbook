@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, AlertTriangle, Plus, Trash, Globe } from 'lucide-react';
+import { Save, AlertTriangle, Plus, Trash, Globe, Edit3, Settings } from 'lucide-react';
 import './WorldHelper.css';
+import PromptModal from './PromptModal';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -11,7 +13,8 @@ function WorldHelper({ currentWorld }) {
     const [generating, setGenerating] = useState(false);
     const [logs, setLogs] = useState([]);
     const [timeline, setTimeline] = useState('');
-
+    const [promptModalOpen, setPromptModalOpen] = useState(false);
+    const [selectedPrompt, setSelectedPrompt] = useState(null);
 
     // Log Polling
     useEffect(() => {
@@ -28,8 +31,6 @@ function WorldHelper({ currentWorld }) {
             const newLogs = res.data.logs;
             setLogs(newLogs);
 
-            // Check if generation finished successfully
-            // Scan last few logs for success message
             const recentLogs = newLogs.slice(-5);
             const success = recentLogs.some(l => l.includes("Updated config:") || l.includes("World generation complete"));
 
@@ -55,7 +56,6 @@ function WorldHelper({ currentWorld }) {
             });
             setTimeline(res.data.content);
         } catch (err) {
-            // It's okay if it doesn't exist yet
             setTimeline('');
         }
     };
@@ -64,7 +64,6 @@ function WorldHelper({ currentWorld }) {
     const fetchConfig = async () => {
         setLoading(true);
         try {
-            // Pass world param
             const res = await axios.get(`${API_BASE}/world-config`, { params: { world: currentWorld } });
             const data = res.data;
             if (!data.characters) data.characters = [];
@@ -80,7 +79,6 @@ function WorldHelper({ currentWorld }) {
         try {
             await axios.post(`${API_BASE}/world-config`, config, { params: { world: currentWorld } });
 
-            // Also save timeline if it exists
             if (timeline) {
                 await axios.post(`${API_BASE}/steering/content`, {
                     category: 'canon',
@@ -102,7 +100,6 @@ function WorldHelper({ currentWorld }) {
         setConfig({ ...config, [field]: value });
     };
 
-    // Character Management
     const addCharacter = () => {
         const newChar = { name: "New Character", role: "Support", description: "", tags: [] };
         setConfig({ ...config, characters: [...config.characters, newChar] });
@@ -124,7 +121,6 @@ function WorldHelper({ currentWorld }) {
         setGenerating(true);
         try {
             await axios.post(`${API_BASE}/generate/world`, { world: currentWorld });
-            // Polling handles the rest
         } catch (err) {
             console.error(err);
             setGenerating(false);
@@ -158,6 +154,11 @@ function WorldHelper({ currentWorld }) {
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const openPromptEditor = (filename) => {
+        setSelectedPrompt(filename);
+        setPromptModalOpen(true);
     };
 
     if (loading || !config) return <div>Loading config...</div>;
@@ -212,13 +213,23 @@ function WorldHelper({ currentWorld }) {
                             />
                         </div>
                     ))}
-                    <div className="char-actions">
-                        <button className="secondary-btn" onClick={addCharacter}>
+                </div>
+
+                <div className="char-actions" style={{ marginTop: '15px', borderTop: '1px solid #333', paddingTop: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <button className="secondary-btn special" onClick={addCharacter}>
                             <Plus size={14} /> Add Manual
                         </button>
                         <button className="secondary-btn special" onClick={autoGenWorld} disabled={generating}>
                             ✨ Auto-Generate (AI)
                         </button>
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', marginTop: '10px' }}>
+                        <span style={{ fontSize: '12px', opacity: 0.7, marginRight: '5px' }}>Configure Agents:</span>
+                        <button className="icon-btn" title="Edit Genesis Agent" onClick={() => openPromptEditor('AGENT_GENESIS.md')}>Genesis</button>
+                        <button className="icon-btn" title="Edit Psyche Agent" onClick={() => openPromptEditor('AGENT_PSYCHE.md')}>Psyche</button>
+                        <button className="icon-btn" title="Edit Embodiment Agent" onClick={() => openPromptEditor('AGENT_EMBODIMENT.md')}>Embodiment</button>
+                        <button className="icon-btn" title="Edit Crucible Agent" onClick={() => openPromptEditor('AGENT_CRUCIBLE.md')}>Crucible</button>
                     </div>
                 </div>
 
@@ -332,6 +343,13 @@ function WorldHelper({ currentWorld }) {
                     </div>
                 </div>
             </div>
+
+            <PromptModal
+                isOpen={promptModalOpen}
+                onClose={() => setPromptModalOpen(false)}
+                world={currentWorld}
+                filename={selectedPrompt}
+            />
         </div>
     );
 }

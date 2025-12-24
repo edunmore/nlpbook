@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 """
-Generate Chapters Script
-
-Reads `canon/world_config.json` and `canon/TIMELINE.md`.
-Generates chapters based on this context. 
-WARNING: This is a devastatingly simple version that just generates a fixed number of chapters 
-based on the timeline, or simply one chapter per "Beat" if we parse it.
-For this MVP, let's assume we want to generate N chapters that fit the timeline.
+Generate Chapters (Recursive)
+Implements the 'Story Engine' protocol:
+1. Loads previous [STORY_STATE] context.
+2. Injects 'Beat' from Chapter Card.
+3. Generates Scene/Sequel.
+4. Updates [STORY_STATE].
 """
 
 import argparse
-import json
+import glob
+import re
 import os
-import subprocess
 import sys
 from pathlib import Path
 
-# Add scripts dir to python path to import agent_utils
+# Add scripts dir
 sys.path.append(str(Path(__file__).resolve().parent))
 from agent_utils import run_agent, load_prompt
 
-# Config
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 WORLDS_DIR = WORKSPACE_ROOT / "worlds"
 
@@ -28,144 +26,108 @@ def load_file(path):
     try:
         with open(path, "r", encoding="utf-8") as f:
             return f.read()
-    except Exception as e:
-        print(f"Error loading {path}: {e}")
+    except:
         return ""
 
-def load_json(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error loading {path}: {e}")
-        sys.exit(1)
+def get_last_chapter_file(chapters_dir):
+    files = sorted(glob.glob(str(chapters_dir / "CH*.md")))
+    if not files:
+        return None
+    return files[-1]
 
-def resolve_file_content(match_text, world_dir, args):
+def extract_story_state(content):
     """
-    Resolves syntax like canon/SERIES_BIBLE.md or planning/chapter-cards/CH001.md
+    Extracts the ```story_state ... ``` block from the end of a file.
     """
-    path_str = match_text.strip()
-    
-    # Handle dynamic substitution in path (e.g. CH{{CHAPTER_NUM}})
-    path_str = path_str.replace("{{CHAPTER_NUM}}", f"{args.chap_num}")
-    
-    # Logic:
-    # If path starts with canon/ -> check world/canon/ -> check default/canon/ -> error
-    # If path starts with planning/ -> check world/planning/ -> check root planning/ ?? 
-    # Actually, planning is currently root, but might become world specific.
-    # User request implies "defaults in each world"
-    
-    # Let's try to find it relative to world root first
-    target = world_dir / path_str
-    if target.exists():
-        return load_file(target)
-        
-    # Fallback for "canon/" to worlds/NEWORLDTEMPLATE/canon if we are in a custom world?
-    # Or maybe just check workspace root?
-    target = WORKSPACE_ROOT / path_str
-    if target.exists():
-        return load_file(target)
-        
-    return f"[MISSING FILE: {path_str}]"
-
+    pattern = r"```story_state(.*?)```"
+    matches = re.findall(pattern, content, re.DOTALL)
+    if matches:
+        return matches[-1].strip()
+    return None
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="gemini", help="CLI tool to use")
-    parser.add_argument("--count", type=int, default=5, help="Number of chapters to generate")
+    parser.add_argument("--world", required=True, help="World name")
+    parser.add_argument("--count", type=int, default=1, help="Chapters to generate")
     parser.add_argument("--start", type=int, default=1, help="Start chapter number")
-    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name (directory in worlds/)")
+    parser.add_argument("--model", default="gemini", help="Model to use")
     args = parser.parse_args()
 
     world_dir = WORLDS_DIR / args.world
-    if not world_dir.exists():
-        print(f"World '{args.world}' not found")
-        sys.exit(1)
-
     chapters_dir = world_dir / "chapters"
+    cards_dir = world_dir / "planning" / "chapter-cards"
+    
     os.makedirs(chapters_dir, exist_ok=True)
-    
-    print(f"Generating {args.count} chapters for world '{args.world}' (Data-Driven)...")
-    
-    # Load Prompt
-    prompt_template = load_prompt(world_dir, "WRITER_INSTRUCTIONS.md")
-    if not prompt_template:
-        print("Error: Could not find WRITER_INSTRUCTIONS.md in world or global prompts.")
+
+    # Load Template
+    # We use WRITER_SCENE_SEQUEL.md by default now
+    writer_prompt = load_prompt(world_dir, "WRITER_SCENE_SEQUEL.md")
+    if not writer_prompt:
+        print("Error: WRITER_SCENE_SEQUEL.md not found.")
         sys.exit(1)
 
-    for i in range(args.start, args.start + args.count):
-        chap_num = f"{i:03}"
-        args.chap_num = chap_num
-        print(f"Generating CH{chap_num}...")
+    # Main Loop
+    current_chap = args.start
+    for _ in range(args.count):
+        chap_str = f"{current_chap:03}"
+        print(f"\nGeneraring CH{chap_str}...")
+
+        # 1. Context: Previous Story State
+        previous_state = ""
+        last_file_path = get_last_chapter_file(chapters_dir)
         
-        # 1. Basic Variable Substitution
-        prompt = template_content
-        prompt = prompt.replace("{{TASK_TITLE}}", f"Generate Chapter {i}")
-        prompt = prompt.replace("{{CHAPTER_NUM}}", chap_num)
-        prompt = prompt.replace("{{TASK_ID}}", f"GEN-{chap_num}")
-        prompt = prompt.replace("{{TASK_DESCRIPTION}}", f"Write Chapter {i} based on the timeline and chapter card.")
-        prompt = prompt.replace("{{TASK_NOTES}}", "Ensure strict adherence to style rules.")
-        
-        # 2. File Content Injection
-        # We look for lines starting with "- " that look like file paths in the "Required Inputs" section?
-        # A robust way is a regex or just line scanning manually if we know the format.
-        # But wait, the template might just list them.
-        # Let's verify WRITER_INSTRUCTIONS format.
-        # It has a section:
-        # ## Required Inputs (Read These Files)
-        # - canon/SERIES_BIBLE.md
-        # ...
-        
-        # We will iterate lines, if we see a file format we recognize, we Inject it?
-        # Or does the context window need the CONTENT?
-        # Yes, we must read the files and Paste them into the prompt.
-        
-        final_prompt_lines = []
-        for line in prompt.split('\n'):
-            stripped = line.strip()
-            # Heuristic for file inclusion: line starting with "- " containing ".md" or ".txt"
-            # Support suffix like " (if exists)"
-            if stripped.startswith("- ") and ("/" in stripped):
-                # Extract potential filename
-                # content usually is "- path/to/file.md" or "- path/to/file.md (notes)"
-                parts = stripped[2:].split(' ')
-                potential_path = parts[0]
-                
-                if potential_path.endswith(".md") or potential_path.endswith(".txt"):
-                    filename = potential_path
-                    content = resolve_file_content(filename, world_dir, args)
-                    
-                    # If content indicates missing file, check if it was marked optional?
-                    # valid return from resolve_file_content is the content string.
-                    # If it returns [MISSING FILE...], we might want to skip if it was "if exists"
-                    
-                    if "[MISSING FILE" in content and "(if exists)" in stripped:
-                         # Skip optional missing file
-                         pass 
-                    else:
-                        final_prompt_lines.append(f"\n--- FILE: {filename} ---\n{content}\n--- END {filename} ---\n")
-                else:
-                    final_prompt_lines.append(line)
+        if last_file_path:
+            content = load_file(last_file_path)
+            state_block = extract_story_state(content)
+            if state_block:
+                previous_state = f"```story_state\n{state_block}\n```"
+                print("  -> Loaded [STORY_STATE] from previous chapter.")
             else:
-                final_prompt_lines.append(line)
-                
-        final_prompt = "\n".join(final_prompt_lines)
+                print("  -> Warning: No [STORY_STATE] found in previous chapter.")
+        else:
+            print("  -> First chapter. Starting fresh.")
+            # Could inject init state from canon if needed?
+
+        # 2. Context: Chapter Card (Beat)
+        card_path = cards_dir / f"CH{chap_str}.md"
+        beat_description = ""
+        if card_path.exists():
+            beat_description = load_file(card_path)
+            print(f"  -> Loaded Beat: {card_path.name}")
+        else:
+            print(f"  -> Warning: No chapter card found for CH{chap_str}")
+            beat_description = "Write the next logical chapter focusing on character conflict."
+
+        # 3. Context: Previous Content (Last ~1000 chars for continuity)
+        prior_context = ""
+        if last_file_path:
+             content = load_file(last_file_path)
+             # simple truncation
+             prior_context = content[-2000:] if len(content) > 2000 else content
+
+        # 4. Construct Prompt
+        # Our template: {{CHAPTER_NUM}}, {{PREVIOUS_CONTENT}}, {{BEAT_DESCRIPTION}}, {{INSTRUCTIONS}}
         
-        # Run Agent
-        output = run_agent(final_prompt, model=args.model, world_dir=world_dir, task_name=f"generate_chapter_{chap_num}", cwd=world_dir)
+        # We inject the STORY STATE into 'PREVIOUS_CONTENT' or a new variable?
+        # The prompt template has {{PREVIOUS_CONTENT}}. Let's combine them.
+        
+        full_prior = f"**Last Chapter Excerpt**:\n{prior_context}\n\n**Current State**:\n{previous_state}"
+        
+        prompt = writer_prompt.replace("{{CHAPTER_NUM}}", chap_str)
+        prompt = prompt.replace("{{PREVIOUS_CONTENT}}", full_prior)
+        prompt = prompt.replace("{{BEAT_DESCRIPTION}}", beat_description)
+        prompt = prompt.replace("{{INSTRUCTIONS}}", "Focus on the 'Ghost' and 'Lie'.")
+
+        # 5. Run Agent
+        output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name=f"write_ch{chap_str}", cwd=world_dir)
         
         if output:
-            first_line = output.strip().split('\n')[0]
-            safe_title = "Generated"
-            if first_line.startswith("#"):
-                safe_title = first_line.replace("#", "").strip().replace(":", "").replace(" ", "-")
-            
-            filename = f"CH{chap_num}-{safe_title}.md"
-            path = chapters_dir / filename
-            
-            with open(path, "w", encoding="utf-8") as f:
+            out_file = chapters_dir / f"CH{chap_str}.md"
+            with open(out_file, "w", encoding="utf-8") as f:
                 f.write(output)
-            print(f"Saved {filename}")
+            print(f"  -> Saved {out_file.name}")
+        
+        current_chap += 1
 
 if __name__ == "__main__":
     main()
