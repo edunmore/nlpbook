@@ -61,7 +61,7 @@ def main():
     parser.add_argument("--model", default="gemini", help="CLI tool to use (gemini or qwen)")
     parser.add_argument("--dry-run", action="store_true", help="Print prompt instead of running agent")
     parser.add_argument("--chapter", help="Specific chapter number/string to filter (e.g. '001')")
-    parser.add_argument("--world", default="default", help="World name")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name")
     
     args = parser.parse_args()
 
@@ -145,7 +145,7 @@ def main():
              print("--- DRY RUN PROMPT END ---\n")
              output = "DRY RUN OUTPUT"
         else:
-            output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name=task_name)
+            output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name=task_name, cwd=world_dir)
         
         if output and not args.dry_run:
             # Save output

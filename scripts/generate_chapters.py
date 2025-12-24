@@ -18,7 +18,7 @@ from pathlib import Path
 
 # Add scripts dir to python path to import agent_utils
 sys.path.append(str(Path(__file__).resolve().parent))
-from agent_utils import run_agent
+from agent_utils import run_agent, load_prompt
 
 # Config
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
@@ -40,24 +40,6 @@ def load_json(path):
         print(f"Error loading {path}: {e}")
         sys.exit(1)
 
-def load_template(world_dir, filename):
-    """
-    Load template with override logic:
-    1. worlds/{world}/prompts/{filename}
-    2. prompts/{filename}
-    """
-    # 1. World Override
-    world_prompt = world_dir / "prompts" / filename
-    if world_prompt.exists():
-        return load_file(world_prompt)
-    
-    # 2. Global Default
-    global_prompt = WORKSPACE_ROOT / "prompts" / filename
-    if global_prompt.exists():
-        return load_file(global_prompt)
-        
-    return ""
-
 def resolve_file_content(match_text, world_dir, args):
     """
     Resolves syntax like canon/SERIES_BIBLE.md or planning/chapter-cards/CH001.md
@@ -78,7 +60,7 @@ def resolve_file_content(match_text, world_dir, args):
     if target.exists():
         return load_file(target)
         
-    # Fallback for "canon/" to worlds/default/canon if we are in a custom world?
+    # Fallback for "canon/" to worlds/NEWORLDTEMPLATE/canon if we are in a custom world?
     # Or maybe just check workspace root?
     target = WORKSPACE_ROOT / path_str
     if target.exists():
@@ -92,7 +74,7 @@ def main():
     parser.add_argument("--model", default="gemini", help="CLI tool to use")
     parser.add_argument("--count", type=int, default=5, help="Number of chapters to generate")
     parser.add_argument("--start", type=int, default=1, help="Start chapter number")
-    parser.add_argument("--world", default="default", help="World name (directory in worlds/)")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name (directory in worlds/)")
     args = parser.parse_args()
 
     world_dir = WORLDS_DIR / args.world
@@ -105,9 +87,9 @@ def main():
     
     print(f"Generating {args.count} chapters for world '{args.world}' (Data-Driven)...")
     
-    # Load Template
-    template_content = load_template(world_dir, "WRITER_INSTRUCTIONS.md")
-    if not template_content:
+    # Load Prompt
+    prompt_template = load_prompt(world_dir, "WRITER_INSTRUCTIONS.md")
+    if not prompt_template:
         print("Error: Could not find WRITER_INSTRUCTIONS.md in world or global prompts.")
         sys.exit(1)
 
@@ -170,7 +152,7 @@ def main():
         final_prompt = "\n".join(final_prompt_lines)
         
         # Run Agent
-        output = run_agent(final_prompt, model=args.model, world_dir=world_dir, task_name=f"generate_chapter_{chap_num}")
+        output = run_agent(final_prompt, model=args.model, world_dir=world_dir, task_name=f"generate_chapter_{chap_num}", cwd=world_dir)
         
         if output:
             first_line = output.strip().split('\n')[0]

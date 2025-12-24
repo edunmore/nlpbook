@@ -1,0 +1,19 @@
+{
+  "title": "world2412a",
+  "characters": [
+    {
+      "name": "Protagonist",
+      "role": "Main",
+      "description": "TBD"
+    },
+    {
+      "name": "Mentor",
+      "role": "Guide",
+      "description": "TBD"
+    }
+  ],
+  "setting": "Modern City",
+  "theme": "Discovery",
+  "source_path": "",
+  "workflow_stage": "brainstorm"
+}

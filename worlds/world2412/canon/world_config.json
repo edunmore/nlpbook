@@ -1,0 +1,60 @@
+{
+  "title": "A x-mas story",
+  "characters": [
+    {
+      "name": "Elara Vance",
+      "role": "Protagonist",
+      "tags": [
+        "Curious",
+        "Apprentice Clockmaker",
+        "Skeptic"
+      ],
+      "description": "A young apprentice clockmaker obsessed with precision. She is the first to notice that the town's mechanical gears are syncing to a rhythm that violates the laws of physics."
+    },
+    {
+      "name": "Herrick 'Saint' Nicolas",
+      "role": "Mentor",
+      "tags": [
+        "Wise",
+        "Toymaker",
+        "Guardian"
+      ],
+      "description": "The village's elderly and enigmatic toymaker. He creates intricate clockwork devices that hint at the world's true nature and acts as a gatekeeper to the village's secrets."
+    },
+    {
+      "name": "Mayor Sterling",
+      "role": "Antagonist",
+      "tags": [
+        "Control Freak",
+        "Traditionalist",
+        "Authoritarian"
+      ],
+      "description": "The impeccably dressed leader of Frosthollow who is obsessed with maintaining the 'Perfect Holiday'. He views any deviation from tradition\u2014or reality\u2014as a threat to be eliminated."
+    },
+    {
+      "name": "Orion",
+      "role": "Ally",
+      "tags": [
+        "Construct",
+        "Loyal",
+        "Glitch"
+      ],
+      "description": "A wooden nutcracker soldier that has gained sentience due to the glitch. He possesses fragmented memories of previous 'cycles' and seeks to protect Elara."
+    },
+    {
+      "name": "The Drifter",
+      "role": "Wildcard",
+      "tags": [
+        "Mysterious",
+        "Outsider",
+        "Herald"
+      ],
+      "description": "A hooded figure who appeared during the last snowstorm. They speak in riddles about the 'User' and the 'Source', unsettling the villagers."
+    }
+  ],
+  "setting": "The secluded village of Frosthollow, nestled deep within the Crag Peaks. It is a place of Victorian charm and eternal winter, where it is perpetually Christmas Eve. The village is illuminated by gas lamps that burn with an unusual, unwavering golden hue, and the snow falls in a perfect, repeating pattern.",
+  "theme": "The discovery of a fabricated reality and the choice between a perfect illusion and an imperfect truth.",
+  "source_path": "",
+  "workflow_stage": "brainstorm",
+  "glitch_concept": "The 13th Hour. As the town clock strikes midnight, it tolls a thirteenth time. For a brief moment, the sky turns to static, the snow freezes in mid-air, and the comforting ambient music of the village distorts into a low, digital hum."
+}

@@ -47,7 +47,7 @@ def load_file(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="gemini", help="CLI tool to use")
-    parser.add_argument("--world", default="default", help="World name")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name")
     args = parser.parse_args()
 
     world_dir = WORLDS_DIR / args.world
@@ -91,7 +91,7 @@ def main():
     prompt = prompt.replace("{{CHARACTERS}}", chars_text)
 
     # Run Agent
-    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_world")
+    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_world", cwd=world_dir)
     
     if output:
         try:

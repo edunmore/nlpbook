@@ -84,86 +84,65 @@ def create_world(req: WorldRequest):
     os.makedirs(paths["root"] / "planning" / "chapter-cards", exist_ok=True)
     os.makedirs(paths["root"] / "history", exist_ok=True)
     
-    # Copy essential canon files from default world
-    default_canon = WORLDS_DIR / "default" / "canon"
-    import shutil
+    # Copy contents from NEWORLDTEMPLATE world canon
+    template_canon = WORLDS_DIR / "NEWORLDTEMPLATE" / "canon"
     
-    # Files to copy as-is (universal rules)
-    files_to_copy = [
-        "BANNED_TERMS.txt", 
-        "STYLE_RULES.md", 
-        "RECURRING_MOTIFS.md",
-        "WORLD_RULES.md",
-        "ENTITY_TEMPLATES.md",
-        "STYLE_GUIDE.md"
-    ]
-    for filename in files_to_copy:
-        src = default_canon / filename
-        dst = paths["canon"] / filename
-        if src.exists():
-            shutil.copy(src, dst)
+    if template_canon.exists():
+        import shutil
+        # Copy all files from template canon
+        for item in template_canon.iterdir():
+            if item.is_file():
+                shutil.copy(item, paths["canon"] / item.name)
     
-    # Create template files for world-specific canon
-    templates = {
-        "SERIES_BIBLE.md": f"""# Series Bible — {req.name}
-
-## Premise
-[Describe your story premise هنا. What is the fundamental conflict?]
-
-## Deep Theme
-[What is this story REALLY about? (e.g., 'The cost of absolute control', 'Finding connection in a digital void')]
-
-## Main Cast
-- **Protagonist**: [Name] - [Specific Role and internal conflict]
-- **Antagonist/Friction**: [Name] - [How they challenge the protagonist]
-- **Mentor/Guide**: [Name] - [The source of NLP concepts]
-
-## Setting
-[Describe the core locations and the 'vibe' of the world]
-""",
-        "CONTINUITY_LEDGER.md": f"""# Continuity Ledger — {req.name}
-
-## Facts & Truths
-- [Key fact about the world that must never be broken]
-
-## Timeline
-- **Event A**: [Description]
-- **Event B**: [Description]
-
-## Character Progress
-- **[Character Name]**: [Current state/location/knowledge]
-""",
-        "OPEN_LOOPS.md": f"# Open Loops — {req.name}\n\n- LOOP-01: [First unresolved plot thread]. Status: OPEN.\n"
-    }
-    for filename, content in templates.items():
-        dst = paths["canon"] / filename
-        if not dst.exists():
-            with open(dst, "w") as f:
-                f.write(content)
     
-    # Create default config with source_path placeholder
-    # Attempt to find common source paths
-    possible_sources = ["NLP", "source", "research"]
-    found_source = ""
-    for ps in possible_sources:
-        if (WORKSPACE_ROOT / ps).exists():
-            found_source = ps
-            break
-
-    default_config = {
-        "title": req.name,
-        "characters": [
-            {"name": "Protagonist", "role": "Main", "description": "TBD"},
-            {"name": "Mentor", "role": "Guide", "description": "TBD"}
-        ],
-        "setting": "Modern City",
-        "theme": "Discovery",
-        "source_path": found_source,
-        "workflow_stage": "brainstorm"
-    }
-    with open(paths["config"], "w") as f:
-        json.dump(default_config, f, indent=2)
+        # Copy Gemini.md specifically (it lives in root, not canon)
+        gemini_src = WORLDS_DIR / "NEWORLDTEMPLATE" / "Gemini.md"
+        gemini_dst = paths["root"] / "Gemini.md"
+        if gemini_src.exists():
+            shutil.copy(gemini_src, gemini_dst)
+            
+        # Copy decentralized prompts and process folders
+        for folder in ["prompts", "process"]:
+            src_folder = WORLDS_DIR / "NEWORLDTEMPLATE" / folder
+            dst_folder = paths["root"] / folder
+            if src_folder.exists():
+                # Ensure destination exists (process might not be in default structure)
+                os.makedirs(dst_folder, exist_ok=True)
+                for item in src_folder.iterdir():
+                    if item.is_file():
+                        shutil.copy(item, dst_folder / item.name)
+    
+    # Load and Update Config
+    if paths["config"].exists():
+        with open(paths["config"], "r") as f:
+            config = json.load(f)
         
+        # Override specific fields with new world info
+        config["title"] = req.name
+        
+        # Attempt to find common source paths if source_path is empty/TBD
+        if not config.get("source_path") or config.get("source_path") == "TBD":
+             possible_sources = ["NLP", "source", "research"]
+             for ps in possible_sources:
+                 if (WORKSPACE_ROOT / ps).exists():
+                     config["source_path"] = ps
+                     break
+        
+        with open(paths["config"], "w") as f:
+            json.dump(config, f, indent=2)
+    else:
+        # Fallback if template config missing
+        default_config = {
+            "title": req.name,
+            "characters": [],
+            "setting": "TBD",
+            "theme": "TBD",
+            "source_path": "",
+            "workflow_stage": "brainstorm"
+        }
+        with open(paths["config"], "w") as f:
+            json.dump(default_config, f, indent=2)
+
     return {"status": "ok", "name": req.name}
 
 

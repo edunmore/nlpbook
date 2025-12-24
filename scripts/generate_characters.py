@@ -47,7 +47,7 @@ def load_file(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="gemini", help="CLI tool to use")
-    parser.add_argument("--world", default="default", help="World name")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name")
     parser.add_argument("--count", type=int, default=3, help="Number of characters to generate")
     args = parser.parse_args()
 
@@ -90,7 +90,7 @@ def main():
     prompt = prompt.replace("{{EXISTING_CHARACTERS}}", chars_text)
     prompt = prompt.replace("{{COUNT}}", str(args.count))
 
-    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_characters")
+    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_characters", cwd=world_dir)
     
     if output:
         try:

@@ -14,11 +14,10 @@ import glob
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent))
-from agent_utils import run_agent
+from agent_utils import run_agent, load_prompt
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 WORLDS_DIR = WORKSPACE_ROOT / "worlds"
-PROMPTS_DIR = WORKSPACE_ROOT / "prompts"
 
 def load_json(path):
     try:
@@ -34,19 +33,10 @@ def load_file(path):
     except:
         return ""
 
-def load_template(world_dir, filename):
-    world_prompt = world_dir / "prompts" / filename
-    if world_prompt.exists():
-        return load_file(world_prompt)
-    global_prompt = PROMPTS_DIR / filename
-    if global_prompt.exists():
-        return load_file(global_prompt)
-    return ""
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="gemini", help="CLI tool to use")
-    parser.add_argument("--world", default="default", help="World name")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name")
     parser.add_argument("--max-files", type=int, default=10, help="Max source files to process")
     parser.add_argument("--chars-per-file", type=int, default=4000, help="Max chars to read per file")
     args = parser.parse_args()
@@ -82,7 +72,7 @@ def main():
     print(f"Found {len(source_files)} source files. Starting discovery scan...")
     
     # --- PHASE 1: DISCOVERY ---
-    discovery_template = load_template(world_dir, "BRAINSTORM_DISCOVERY.md")
+    discovery_template = load_prompt(world_dir, "BRAINSTORM_DISCOVERY.md")
     if discovery_template:
         excerpts = ""
         for fpath in source_files:
@@ -95,7 +85,7 @@ def main():
         disc_prompt = disc_prompt.replace("{{EXCERPTS}}", excerpts)
         disc_prompt = disc_prompt.replace("{{COUNT}}", str(args.max_files))
         
-        disc_output = run_agent(disc_prompt, model=args.model, world_dir=world_dir, task_name="brainstorm_discovery")
+        disc_output = run_agent(disc_prompt, model=args.model, world_dir=world_dir, task_name="brainstorm_discovery", cwd=world_dir)
         
         if disc_output:
             try:
@@ -148,7 +138,7 @@ def main():
         prompt = prompt.replace("{{THEME}}", config.get('theme', ''))
         prompt = prompt.replace("{{SETTING}}", config.get('setting', ''))
         
-        output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name=f"brainstorm_{filename[:20]}")
+        output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name=f"brainstorm_{filename[:20]}", cwd=world_dir)
         
         if output:
             try:

@@ -14,12 +14,11 @@ from pathlib import Path
 
 # Add scripts dir to python path to import agent_utils
 sys.path.append(str(Path(__file__).resolve().parent))
-from agent_utils import run_agent
+from agent_utils import run_agent, load_prompt
 
 # Config
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 WORLDS_DIR = WORKSPACE_ROOT / "worlds"
-PROMPTS_DIR = WORKSPACE_ROOT / "prompts"
 
 def load_json(path):
     try:
@@ -39,7 +38,7 @@ def load_file(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="gemini", help="CLI tool to use")
-    parser.add_argument("--world", default="default", help="World name (directory in worlds/)")
+    parser.add_argument("--world", default="NEWORLDTEMPLATE", help="World name (directory in worlds/)")
     args = parser.parse_args()
 
     world_dir = WORLDS_DIR / args.world
@@ -58,19 +57,12 @@ def main():
     config = load_json(config_file)
     
     # Select Trigger (Steering File)
-    # Check for World Specific Override first
     trigger_name = "STORY_GENERATOR.md"
-    trigger_path = world_dir / "prompts" / trigger_name
+    prompt_template = load_prompt(world_dir, trigger_name)
     
-    if not trigger_path.exists():
-         trigger_path = PROMPTS_DIR / trigger_name
-         
-    if not trigger_path.exists():
-        print(f"Prompt template not found: {trigger_name}")
+    if not prompt_template:
+        print(f"Error: Could not load prompt template {trigger_name}")
         sys.exit(1)
-        
-    print(f"Using Prompt Template: {trigger_path}")
-    prompt_template = load_file(trigger_path)
 
     # Format character list
     chars_text = ""
@@ -85,7 +77,7 @@ def main():
     prompt = prompt.replace("{{GLITCH_CONCEPT}}", config.get('glitch_concept', ''))
     prompt = prompt.replace("{{TIMELINE_LENGTH}}", str(config.get('timeline_length_weeks', 4)))
 
-    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_storyline")
+    output = run_agent(prompt, model=args.model, world_dir=world_dir, task_name="generate_storyline", cwd=world_dir)
     
     if output:
         with open(timeline_file, "w", encoding="utf-8") as f:
