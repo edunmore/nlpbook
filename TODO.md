@@ -17,44 +17,15 @@ We have successfully completed the massive "V2 Refactor" to support the **Recurs
 
 ---
 
-## 🚀 Immediate Next Steps (The Migration)
-We are moving from the slow exFAT drive to your native home folder.
+## 🎯 Current Focus (Post-Migration)
+Now that we are settled in the new drive, we are tackling:
 
-### 1. Clone to New Location
-Run this on your machine:
-```bash
-# Create projects folder
-mkdir -p ~/projects
-cd ~/projects
+### 1. Refine Didactic Output
+- [ ] Test the "Phoenix Logic" on real transcripts.
+- [ ] Tune the `AGENT_DIDACTIC_ARCHITECT` prompt.
 
-# Clone fresh
-git clone https://github.com/edunmore/nlpbook.git nlpbook-native
-cd nlpbook-native
-```
+### 2. Series Bible UI
+- [ ] Build a dedicated GUI page for viewing/editing the `canon/` files.
 
-### 2. Setup Environment (One Time)
-Run this inside `~/projects/nlpbook-native`:
-```bash
-# Backend Setup
-python3 -m venv gui/backend/venv
-source gui/backend/venv/bin/activate
-pip install fastapi uvicorn
-
-# Frontend Setup
-cd gui/client
-npm install
-```
-
-### 3. Start Working
-Open VS Code in `~/projects/nlpbook-native`.
-Terminals:
-- **Backend**: `source gui/backend/venv/bin/activate && python gui/backend/main.py`
-- **Frontend**: `cd gui/client && npm run dev`
-
----
-
-## 🔮 Future Roadmap (Post-Migration)
-Once settled in the new drive, we can tackle:
-1.  **Refine Didactic Output**: Test the "Phoenix Logic" on real transcripts and tune the prompt.
-2.  **Series Bible UI**: Build a dedicated GUI page for viewing/editing the `canon/` files.
-3.  **Chat Interface**: Allow chatting with the "Didactic Architect" to refine the story interactively.
+### 3. Chat Interface
+- [ ] Allow chatting with the "Didactic Architect" to refine the story interactively.
