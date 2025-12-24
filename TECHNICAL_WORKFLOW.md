@@ -9,24 +9,33 @@ This document details the exact file operations, prompt templates, and scripts u
 - **Script**: `scripts/generate_world.py`
 - **Context**: `cwd = worlds/[WorldName]`
 - **Input Files**:
-    - `canon/world_config.json` (Reads Title, existing fields)
+    - `canon/world_config.json` (Reads Title, existing fields) // I assume this is saved when the World Config page is saved
     - `prompts/WORLD_BUILDER.md` (The Prompt Template)
 - **Prompt Logic**:
-    - Loads `WORLD_BUILDER.md` (Overrides: `worlds/[World]/prompts/` > `prompts/`)
+    - Loads `WORLD_BUILDER.md` (Overrides: `worlds/[World]/prompts/` > `prompts/`) // this is executed when the World Config Auto-Generate (AI) button is clicked
     - Injects: `{{TITLE}}`, `{{SETTING}}`, `{{THEME}}`, `{{GLITCH}}`, `{{CHARACTERS}}`
 - **AI Task**: `generate_world`
 - **Output**:
     - Updates `canon/world_config.json` with new/refined fields.
 
-## 2. Planning: Brainstorming
+// WORD BUILDER is quite generic as instructions - I think we need better foundation material for this - see the /lernwriting folder for inspiration 
+// my general question is, is it the right point??? Wouldnt we need refinements ones we have more material? Or better - shouldnt be the brainstorm with the source
+// happen before all that? Like what are we doing here? We do not know anything whats the book is all about, right? No inspiration nothing. I assume in the past it
+// was working, as we had old information in the canon from the default world, but as we cleaned all that, we need to rethink this. 
+// on the other hand, I should do that on my own - create the world with some data, than brainstorm and come back to refine the character???
+
+## 2. Planning: Brainstorming   
 **Goal**: Generate story concepts from source material.
+
+// I thought we iterate through the source file and let the AI generate for each file and not give it all files to avoid context overflow. For that the discovery should be more clear - we are looking for topics which would support our story from the source. For inspiration. We might give it the brainstorm list we have so far, so it might add to it. Or is it doing this like this already??? 
+// the goal would not to get characters etc. but to get inspiration from the source - like from a NLP source which talks about peripheral vision to give you more perpective - we do not need a story from that already. We need the best inspiration from the source, maybe how this is described in the source. The stories itself we would create later on. Or I am confused by the whole concept now. Comes back to - check out lernwriting folder for how we should do it.
 
 - **GUI Action**: "Generate from Source" button.
 - **API Endpoint**: `/api/generate/brainstorm`
 - **Script**: `scripts/generate_brainstorm_iterative.py`
 - **Input Files**:
     - `source/*` (Text/MD files for inspiration)
-    - `prompts/BRAINSTORM_DISCOVERY.md` (Phase 1)
+    - `prompts/BRAINSTORM_DISCOVERY.md` (Phase 1)   
     - `prompts/BRAINSTORM_GENERATOR.md` (Phase 2)
 - **Prompt Logic**:
     - **Phase 1 (Discovery)**: Scans source files. Uses `BRAINSTORM_DISCOVERY.md` to find interesting themes.
