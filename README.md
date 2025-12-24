@@ -94,10 +94,12 @@ Visit `http://localhost:5173` to start writing.
 ## 📂 Directory Structure
 
 - `worlds/` — Contains all user-created worlds.
+    - `NEWORLDTEMPLATE/` — The master template for new worlds.
     - `[WorldName]/canon/` — Bibles, rules, and configs.
+    - `[WorldName]/prompts/` — World-specific prompt overrides.
     - `[WorldName]/chapters/` — Markdown content files.
     - `[WorldName]/planning/` — Brainstorms and maps.
-- `prompts/` — System prompts for the AI agents.
+- `prompts/` — Global default prompts (fallback).
 - `scripts/` — Python automation scripts called by the backend.
 - `gui/` — React frontend and FastAPI backend.
 

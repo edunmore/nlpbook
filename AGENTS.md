@@ -40,6 +40,19 @@ At the beginning of each session or major task:
    `cp /path/to/original /home/mac/.gemini/shadow_workspace/path/to/shadow`
 3. Verify in browser.
 
+## 🧩 Template System & Decentralized Prompts
+**New World Creation**:
+- All new worlds are clones of `worlds/NEWORLDTEMPLATE`.
+- **Canon**: `world_config.json`, `SERIES_BIBLE.md` etc are copied from the template.
+- **Prompts**: `prompts/` and `process/` are copied to `worlds/[WorldName]/prompts/`.
+- **Customization**: You can edit `worlds/[WorldName]/prompts/WRITER_INSTRUCTIONS.md` to change the AI's behavior *only for that world*.
+
+## 🤖 Gemini Context Scoping
+The `gemini` CLI is always executed with `cwd = worlds/[CurrentWorld]`.
+- **Visibility**: The agent sees `canon/`, `chapters/`, and `Gemini.md` in the root.
+- **Prompt Loading**: Scripts prioritize `worlds/[World]/prompts/[File]` over global defaults.
+- **Gemini.md**: A file in the world root that gives the agent context about its role and file structure.
+
 ## 🧠 Solved Issues (Memory)
 - **Storyline UI**: The "Storyline / Timeline" textarea was missing. Fixed in `WorldHelper.jsx` by adding a dedicated textarea bound to `TIMELINE.md` steering content.
 - **Frontend/Backend Paths**: Frontend runs on :5173, Backend on :8000. Backend serves files from `worlds/`.

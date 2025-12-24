@@ -12,7 +12,7 @@ This guide documents the end-to-end workflow for creating and refining a book us
 3.  **Enter Name**: Type the name of your new world (e.g., "SciFi-Epic") and click **Create World**.
     ![Creation Modal](/home/mac/.gemini/antigravity/brain/127a6cfa-a692-400d-b7dc-2ed6a16b2862/modal_with_text_entered_final_1766407469959.png)
 
-4.  **Result**: The world is created, and you are directed to the **World Config** page.
+4.  **Result**: The world is created as a clone of `NEWORLDTEMPLATE` (including all prompts and process files). You are directed to the **World Config** page.
     ![World Config](/home/mac/.gemini/antigravity/brain/127a6cfa-a692-400d-b7dc-2ed6a16b2862/final_state_created_final_1766407491508.png)
 
 ---
